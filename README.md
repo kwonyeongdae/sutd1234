@@ -64,3 +64,13 @@ public class BoardController {
 
 ## 문서 내부 참조  
 [문서의 처음으로 이동](#마크다운-간단-문법)
+
+## 강조하기
+Hello *world*  
+_Hello_ World  
+Hello **World**  
+__Hello__ World  
+~~Hello~~ World
+
+## 이미지 표현방법
+<img ser="">
