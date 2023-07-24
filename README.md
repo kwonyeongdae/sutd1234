@@ -73,7 +73,7 @@ __Hello__ World
 ~~Hello~~ World
 
 ## 이미지 표현방법
-<img src="oasd.png" alt="배경사진" title ="바닷가 풍경">
+<img src="oasd.PNG" alt="배경사진" title ="바닷가 풍경">
 
 ## 인용문
 아래는 인용문 입니다
