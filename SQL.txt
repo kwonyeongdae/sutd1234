@@ -1,0 +1,151 @@
+CREATE TABLE dept(deptno NUMBER,dname VARCHAR2(200),loc VARCHAR2(200),CONSTRAINT pk_dept PRIMARY KEY (deptno));
+
+INSERT INTO dept VALUES(10, 'ACCOUNTING', 'NEW YORK');
+INSERT INTO dept VALUES(20, 'RESEARCH', 'DALLAS');
+INSERT INTO dept VALUES(30, 'SALES', 'CHICAGO');
+INSERT INTO dept VALUES(40, 'OPERATIONS', 'BOSTON');
+
+SELECT*from dept;
+
+CREATE TABLE emp(empno NUMBER,ename VARCHAR2(15),job VARCHAR2(10),mgr NUMBER(4,0),hiredate DATE,sal NUMBER(7,2),comm NUMBER(7,2),deptno NUMBER,
+  CONSTRAINT pk_empno PRIMARY KEY (empno),CONSTRAINT fk_deptno FOREIGN KEY (deptno) REFERENCES dept (deptno));
+  
+INSERT INTO emp VALUES( 7839, 'KING', 'PRESIDENT', null, to_date('1996-11-17','yyyy-mm-dd'), 5000, null, 10);
+INSERT INTO emp VALUES( 7698, 'BLAKE', 'MANAGER', 7839, to_date('1991-1-05','yyyy-mm-dd'), 2850, null, 30);
+INSERT INTO emp VALUES( 7782, 'CLARK', 'MANAGER', 7839, to_date('1999-9-06','yyyy-mm-dd'), 2450, null, 10);
+INSERT INTO emp VALUES( 7566, 'JONES', 'MANAGER', 7839, to_date('2001-02-04','yyyy-mm-dd'), 2975, null, 20);
+INSERT INTO emp VALUES( 7788, 'SCOTT', 'ANALYST', 7566, to_date('2003-06-17','yyyy-mm-dd'), 3000, null, 20);
+INSERT INTO emp VALUES( 7902, 'FORD', 'ANALYST', 7566, to_date('1981-03-12','yyyy-mm-dd'), 3000, null, 20);
+INSERT INTO emp VALUES( 7369, 'SMITH', 'CLERK', 7902, to_date('2007-12-1','yyyy-mm-dd'), 800, null, 20);
+INSERT INTO emp VALUES( 7499, 'ALLEN', 'SALESMAN', 7698, to_date('20-2-1981','dd-mm-yyyy'), 1600, 300, 30);
+INSERT INTO emp VALUES( 7521, 'WARD', 'SALESMAN', 7698, to_date('22-2-1981','dd-mm-yyyy'), 1250, 500, 30);
+INSERT INTO emp VALUES( 7654, 'MARTIN', 'SALESMAN', 7698, to_date('28-9-1981','dd-mm-yyyy'), 1250, 1400, 30);
+INSERT INTO emp VALUES( 7844, 'TURNER', 'SALESMAN', 7698, to_date('8-9-1981','mm-dd-yyyy'), 1500, 0, 30);
+INSERT INTO emp VALUES( 7876, 'ADAMS', 'CLERK', 7788, to_date('13-7-87', 'dd-mm-yy') - 51, 1100, null, 20);
+INSERT INTO emp VALUES( 7900, 'JAMES', 'CLERK', 7698, to_date('3-12-1981','mm-dd-yyyy'), 950, null, 30);
+INSERT INTO emp VALUES( 7934, 'MILLER', 'CLERK', 7782, to_date('2003-1-23','yyyy-mm-dd'), 1300, null, 10);
+
+SELECT*FROM emp;
+
+CREATE TABLE salgrade(
+  grade NUMBER,
+  losal NUMBER,
+  hisal NUMBER
+);
+
+DESC salgrade;
+
+INSERT INTO salgrade VALUES (1, 700, 1200);
+INSERT INTO salgrade VALUES (2, 1201, 1400);
+INSERT INTO salgrade VALUES (3, 1401, 2000);
+INSERT INTO salgrade VALUES (4, 2001, 3000);
+INSERT INTO salgrade VALUES (5, 3001, 9999);
+
+SELECT*FROM salgrade;
+
+SELECT empno,ename,d.deptno,loc FROM emp e INNER JOIN dept d ON e.deptno=d.deptno;
+
+SELECT DISTINCT deptno FROM emp ORDER BY deptno;
+
+SELECT ename, empno, loc FROM dept d INNER JOIN emp e ON d.deptno=e.deptno WHERE loc= 'DALLAS';
+
+SELECT sal FROM emp;
+
+SELECT sal FROM emp WHERE sal between 800 and 5000;
+
+SELECT ename, sal, grade FROM salgrade s INNER JOIN emp e ON e.sal  between s.losal and s.hisal WHERE ename= 'SMITH';
+
+SELECT ename,dname,grade FROM salgrade s INNER JOIN emp e ON e.sal  between s.losal and s.hisal 
+INNER JOIN dept p ON e.deptno=p.deptno WHERE ename= 'BLAKE';
+
+SELECT COUNT(*) as "사원수" FROM emp;
+
+SELECT COUNT(mgr) as "사원수" FROM emp;
+
+SELECT COUNT(DISTINCT job)"직무수" FROM emp;
+
+SELECT COUNT(*)"직무수" FROM
+(
+    SELECT DISTINCT job FROM emp
+);
+
+SELECT sum(sal) FROM emp WHERE mgr is not null;
+
+SELECT min(sal)"최소월급",max(sal)"최대월급",ROUND(AVG(sal),0)"평균월급"  FROM emp WHERE mgr is not null;
+
+SELECT min(sal)"최소월급",max(sal)"최대월급",CEIL(AVG(sal))"평균월급"  FROM emp WHERE mgr is not null;
+
+SELECT min(sal)"최소월급",max(sal)"최대월급",FLOOR(AVG(sal))"평균월급"  FROM emp WHERE mgr is not null;
+
+SELECT m.empno,m.ename,e.empno,e.ename FROM emp m INNER JOIN emp e on m.mgr=e.empno WHERE m.ename='BLAKE';
+
+SELECT*FROM emp m INNER JOIN emp e on m.job=e.job WHERE e.ename ='BLAKE';
+
+SELECT empno,ename, DECODE(deptno,10,'인사과',20,'개발팀',30,'생산과')"부서" from emp;
+
+SELECT ename,job,sal,DECODE(job,'PRESIDENT',sal*0.7,sal)"세급여" from emp;
+
+SELECT ename,d.dname,sal,DECODE(d.dname,'RESEARCH',sal,sal*1.03)"증액급여" FROM emp e
+INNER JOIN dept d ON e.deptno = d.deptno ORDER BY d.dname;
+
+SELECT empno,ename,deptno, CASE WHEN deptno = 10 THEN '인사과'
+                            WHEN deptno = 20 THEN '총무과'
+                            WHEN deptno = 30 THEN '연구과'
+                            ELSE '기타' END"부서명" FROM emp;
+                            
+SELECT ename,hiredate FROM emp WHERE to_char(hiredate,'mm')=05;
+
+SELECT ename,to_char(hiredate,'mm')FROM emp ORDER BY to_char(hiredate,'mm');
+
+CREATE OR REPLACE VIEW v_hiremonth as SELECT empno,ename,to_char(hiredate,'mm')입사월 FROM emp;
+
+CREATE OR REPLACE VIEW EMP_VIEW as SELECT 
+
+SELECT*FROM v_hiremonth;
+
+SELECT*FROM emp WHERE empno=7369;
+SELECT*FROM emp WHERE ename='JONES';
+
+CREATE INDEX emp_ename ON emp(ename);
+
+CONSTRAINT fk_user_code FOREIGN KEY(user_code)references member(num);
+
+ALTER TABLE ordertb
+ADD CONSTRAINT fk_user_code FOREIGN KEY(user_code) references member(num);
+
+SELECT*FROM emp;
+
+SELECT *FROM emp WHERE deptno = 20 ORDER BY ename, sal DESC;
+
+SELECT*FROM emp e INNER JOIN dept d ON e.deptno=d.deptno WHERE d.deptno = 20;
+
+SELECT ename,job,e.deptno FROM emp e INNER JOIN dept d ON e.deptno=d.deptno WHERE e.ename = 'SMITH';
+
+SELECT ename, sal, job FROM emp WHERE deptno = 10 AND job = 'MANAGER';
+
+SELECT ename, job, sal FROM emp WHERE sal>=800 and sal<=2000;
+
+SELECT ename, job, sal FROM emp WHERE sal  between 800 and 3000;
+
+SELECT *FROM emp WHERE deptno>=10 AND deptno<=30;
+
+SELECT *FROM emp WHERE deptno in(10,20);
+
+SELECT empno, ename FROM emp WHERE mgr is not null;
+
+SELECT min(800),max(5000),ROUND(avg(sal),2) FROM emp WHERE mgr is not null;
+
+SELECT deptno as "부서이름" ,ROUND(avg(sal),2)as"평균월급" FROM emp GROUP BY DEPTNO;
+
+SELECT ename,dname,job,sal FROM emp e INNER JOIN dept d on e.deptno=d.deptno;
+
+SELECT ename,job FROM emp WHERE job =(SELECT job FROM emp WHERE ename= 'SMITH');
+
+SELECT e.deptno"부서코드", d.dname"부서명",COUNT(e.deptno)"부서별인원수",min(e.sal)"최소급여",
+max(e.sal)"최대급여" FROM emp e INNER JOIN dept d on e.deptno=d.deptno GROUP BY e.deptno,d.dname;
+
+SELECT e.empno,e.ename,d.dname,e.sal,CASE WHEN d.dname = 'SALES' THEN e.sal*1.1 ELSE e.sal END AS "인상급여" FROM emp e
+INNER JOIN dept d on e.deptno=d.deptno;
+
+SELECT e.empno,e.ename,d.dname,e.sal,DECODE(d.dname,'SALES',e.sal*1.1,e.sal)"인상급여" FROM emp e
+INNER JOIN dept d on e.deptno=d.deptno;
